@@ -256,13 +256,23 @@ class TAG_String(TAG, Sequence):
         if buffer:
             self._parse_buffer(buffer)
 
+    #Safe decode to fix corrupt utf-8 decoding (from https://github.com/erocs/Minecraft-Region-Fixer)
+    def decode_string(s):
+        for codec in ('utf-8', 'ISO-8859-1'):
+            try:
+                decoded = s.decode(codec)
+                return decoded
+            except:
+                pass
+        return ''
+
     #Parsers and Generators
     def _parse_buffer(self, buffer):
         length = TAG_Short(buffer=buffer)
         read = buffer.read(length.value)
         if len(read) != length.value:
             raise StructError()
-        self.value = read.decode("utf-8")
+        self.value = decode_string(read)
 
     def _render_buffer(self, buffer):
         save_val = self.value.encode("utf-8")
