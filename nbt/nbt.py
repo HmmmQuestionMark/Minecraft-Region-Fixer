@@ -29,6 +29,17 @@ TAG_LIST = 9
 TAG_COMPOUND = 10
 TAG_INT_ARRAY = 11
 
+
+#Safe decode to fix corrupt utf-8 decoding (from https://github.com/erocs/Minecraft-Region-Fixer)
+def decode_string(s):
+    for codec in ('utf-8', 'ISO-8859-1'):
+        try:
+            decoded = s.decode(codec)
+            return decoded
+        except:
+            pass
+    return ''
+
 class MalformedFileError(Exception):
     """Exception raised on parse error."""
     pass
@@ -255,16 +266,6 @@ class TAG_String(TAG, Sequence):
         super(TAG_String, self).__init__(value, name)
         if buffer:
             self._parse_buffer(buffer)
-
-    #Safe decode to fix corrupt utf-8 decoding (from https://github.com/erocs/Minecraft-Region-Fixer)
-    def decode_string(s):
-        for codec in ('utf-8', 'ISO-8859-1'):
-            try:
-                decoded = s.decode(codec)
-                return decoded
-            except:
-                pass
-        return ''
 
     #Parsers and Generators
     def _parse_buffer(self, buffer):
